@@ -1,4 +1,4 @@
-const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+const clientId = process.env.VITE_SPOTIFY_CLIENT_ID;
 const code = undefined;
 
 if (!code) {
