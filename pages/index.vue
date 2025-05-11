@@ -6,7 +6,6 @@
       </div>
       <div class="navigation">
         <router-link to="/signin" class="nav-link">Sign-in</router-link>
-        <router-link to="/signup" class="nav-link">Sign-up</router-link>
       </div>
     </div>
 
@@ -14,7 +13,7 @@
       <h1>Music for everyone.</h1>
       <p>Millions of songs. Tune to your vibe.</p>
       <div class="cta-buttons">
-        <router-link to="/signup" class="cta-button primary"
+        <router-link to="/signin" class="cta-button primary"
           >Get Songify for Free</router-link
         >
       </div>

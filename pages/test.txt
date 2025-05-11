@@ -1,0 +1,55 @@
+// ... existing code ...
+import SearchComponent from "../components/SearchComponent.vue";
+
+// ... existing code ...
+
+<template>
+  <div class="main-layout" v-if="profile && playlists">
+    <aside class="library">
+      <div class="logo-container">
+        <img src="../assets/small.png" alt="Logo" class="logo" />
+      </div>
+      <h2>Library</h2>
+      <ul>
+        <li @click="router.push('/playlists')">Playlists</li>
+        <li @click="router.push('/artists')">Artists</li>
+        <li @click="router.push('/albums')">Albums</li>
+        <li @click="router.push('/tracks')">Tracks</li>
+      </ul>
+    </aside>
+
+    <main class="content">
+      <section class="header-section">
+        <section class="search-section">
+          <div class="search-box" ref="searchBoxRef">
+            <i class="fas fa-search"></i>
+            <input 
+              type="text" 
+              placeholder="What do you want to play?"
+              v-model="searchQuery"
+              @input="handleSearch"
+              @focus="showSearchResults = true"
+            />
+            <button v-if="searchQuery" class="clear-search-btn" @click="clearSearch">
+              <i class="fas fa-times"></i>
+            </button>
+            
+            <!-- Replace the existing search results dropdown with SearchComponent -->
+            <SearchComponent 
+              v-if="showSearchResults && searchResults && searchQuery" 
+              :results="searchResults" 
+              :searchQuery="searchQuery"
+              :onClose="() => showSearchResults = false"
+            />
+          </div>
+        </section>
+
+        <div class="profile-container" @click="router.push('/profile')">
+          <div class="profile-picture" v-if="!profile.images?.[0]?.url">
+            {{ profile.display_name?.charAt(0)?.toUpperCase() }}
+          </div>
+          <img v-else :src="profile.images?.[0]?.url" alt="Profile Image" />
+        </div>
+      </section>
+// ... existing code ...
+</template>

@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -12,6 +12,7 @@
   "dependencies": {
     "@clerk/clerk-js": "^5.63.5",
     "@clerk/nuxt": "^1.6.0",
+    "@ngrok/ngrok": "^1.5.1",
     "@nuxt/fonts": "^0.11.2",
     "@nuxt/icon": "^1.12.0",
     "@nuxt/image": "^1.10.0",
