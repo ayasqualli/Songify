@@ -22,9 +22,8 @@
           </div>
           <img v-else :src="profile.images?.[0]?.url" alt="Profile Image" />
         </div>
-        
       </section>
-      
+
       <section class="playlists">
         <h1>Your Playlists</h1>
         <ul class="playlist-grid">
@@ -42,29 +41,29 @@
         </ul>
       </section>
 
-        <HorizontalSection
-          title="Your Top Artists"
-          :items="
-            topArtists.map((artist) => ({
-              id: artist.id,
-              images: artist.images,
-              name: artist.name,
-            }))
-          "
-        />
+      <HorizontalSection
+        title="Your Top Artists"
+        :items="
+          topArtists.map((artist) => ({
+            id: artist.id,
+            images: artist.images,
+            name: artist.name,
+          }))
+        "
+      />
 
-        <HorizontalSection
-          title="Your Top Tracks"
-          :items="
-            topTracks.map((track) => ({
-              id: track.id,
-              images: track.album.images,
-              name: track.name,
-              artists: track.artists,
-            }))
-          "
-          @click.prevent="playTrack"
-        />
+      <HorizontalSection
+        title="Your Top Tracks"
+        :items="
+          topTracks.map((track) => ({
+            id: track.id,
+            images: track.album.images,
+            name: track.name,
+            artists: track.artists,
+          }))
+        "
+        @click.prevent="navigateToTrack(track.id)"
+      />
 
       <HorizontalSection
         title="Recently Played"
@@ -104,8 +103,16 @@ const recentlyPlayed = ref([]);
 const trackId = route.params.id;
 const track = ref(null);
 
-const playTrack = (trackUri) => {
-  router.push(`/track/${track.track.id}`);
+const navigateToAlbum = (albumId) => {
+  router.push(`/album/${albumId}`);
+};
+
+const navigateToTrack = (trackId) => {
+  router.push(`/track/${trackId}`);
+};
+
+const navigateToArtist = (artistId) => {
+  router.push(`/artist/${artistId}`);
 };
 
 const uniqueRecentlyPlayed = computed(() => {
@@ -139,17 +146,6 @@ const getArtistNames = (artists) => {
   return artists.map((artist) => artist.name).join(", ");
 };
 
-const navigateToArtist = (artistId) => {
-  router.push(`/artist/${artistId}`);
-};
-
-const navigateToAlbum = (albumId) => {
-  router.push(`/album/${albumId}`);
-};
-
-const navigateToPlaylist = (playlistId) => {
-  router.push(`/playlist/${playlistId}`);
-};
 
 const getAlbumArtist = (album) => {
   if (!album.artists?.length) return "Unknown Artist";
@@ -243,19 +239,20 @@ onMounted(async () => {
     recentlyPlayed.value = (await resRecentlyPlayed.json()).items;
 
     // Fetch track details
-    const trackResponse = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const trackResponse = await fetch(
+      `https://api.spotify.com/v1/tracks/${trackId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!trackResponse.ok) {
-      throw new Error('Failed to fetch track');
+      throw new Error("Failed to fetch track");
     }
 
     track.value = await trackResponse.json();
-    
-
   } catch (err) {
     console.error("Erreur Spotify:", err);
     playlists.value = [];
