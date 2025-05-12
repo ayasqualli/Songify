@@ -1,4 +1,8 @@
 <template>
+    <div class="page-container">
+        <button class="home-button" @click="goHome">
+      <Icon name="ph:house" size="40" />
+    </button>
   <div v-if="profile" class="profile-page">
     <section class="profile-section">
       <div class="profile-header">
@@ -56,6 +60,7 @@
   <div v-else class="loading-container">
     <p class="loading-text">Chargement des données Spotify...</p>
   </div>
+</div>
 </template>
 
 <script setup>
@@ -106,6 +111,10 @@ const logout = () => {
 </script>
 
 <style scoped>
+
+.page-container{
+    padding : 16px;
+}
 .profile-section {
   padding: 8px;
 }
@@ -115,9 +124,8 @@ const logout = () => {
   align-items: center;
   gap: 2rem;
   padding: 2rem;
-  background: linear-gradient(to bottom, #555555, #2c2c2c);
-  border-radius: 12px;
-  margin-bottom: 2rem;
+  background: linear-gradient(to bottom, #555555, #282828);
+  border-radius: 12px 12px 0 0;
   position: relative;
 }
 
@@ -176,7 +184,7 @@ const logout = () => {
 
 .profile-details {
   background: #282828;
-  border-radius: 8px;
+  border-radius: 0 0 12px 12px;
   padding: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -265,5 +273,24 @@ const logout = () => {
 .loading-text {
   color: #b3b3b3;
   font-size: 1.2rem;
+}
+
+.home-button {
+  padding: 8px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  background: transparent;
+  color: white;
+  border: none;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  align-items:center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+  z-index: 100;
 }
 </style>
