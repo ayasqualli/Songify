@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   const params = new URLSearchParams();
   params.append('grant_type', 'authorization_code');
   params.append('code', code);
-  params.append('redirect_uri', 'http://127.0.0.1:3000/callback');
+  params.append('redirect_uri', 'https://songify-app.vercel.app/callback');
 
   const credentials = btoa(`${clientId}:${clientSecret}`);
 

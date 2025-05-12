@@ -51,7 +51,7 @@ async function redirectToAuthCodeFlow(clientId) {
   const params = new URLSearchParams();
   params.append("client_id", clientId);
   params.append("response_type", "code");
-  params.append("redirect_uri", "http://127.0.0.1:3000/callback");
+  params.append("redirect_uri", "https://songify-app.vercel.app/callback");
   params.append("scope", "user-read-private user-read-email user-library-read playlist-read-private playlist-read-collaborative user-top-read user-read-recently-played user-follow-read user-read-playback-state user-modify-playback-state user-read-currently-playing user-read-playback-position user-read-recently-played user-read-playback-state user-modify-playback-state user-library-modify user-library-read user-read-currently-playing user-read-playback-position user-read-recently-played user-top-read user-read-playback-state user-modify-playback-state user-library-modify user-library-read user-read-currently-playing user-read-playback-position user-read-recently-played user-top-read playlist-modify-public playlist-modify-private");
 
   window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
