@@ -18,7 +18,10 @@
           <h1>{{ profile.display_name }}</h1>
           <p>{{ publicPlaylistsCount }} Public Playlists - {{ profile.followers?.total }} Followers</p>
         </div>
-        <button class="logout-button" @click="logout">Déconnexion</button>
+        <button class="logout-button" @click="logout">
+          <span>Logout</span>
+          <Icon name="material-symbols:logout" size="20" />
+        </button>
       </div>
 
       <div class="profile-details">
@@ -48,7 +51,6 @@
         </div>
       </div>
 
-      <button class="logout-button" @click="logout">Déconnexion</button>
     </section>
   </div>
   <div v-else class="loading-container">
@@ -116,6 +118,7 @@ const logout = () => {
   background: linear-gradient(to bottom, #555555, #2c2c2c);
   border-radius: 12px;
   margin-bottom: 2rem;
+  position: relative;
 }
 
 .profile-image-container {
@@ -150,6 +153,7 @@ const logout = () => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  flex: 1;
 }
 
 .profile-name p:first-child {
@@ -237,22 +241,20 @@ const logout = () => {
 }
 
 .logout-button {
-  width: fit-content;
-  padding: 1rem;
-  background-color: #ff4d4d;
-  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
   border: none;
-  text-align: center; 
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 16px;
-  font-size: 1rem;
+  color: #fffafa;
+  padding: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: color 0.2s ease;
+  margin-bottom: auto;
 }
 
 .logout-button:hover {
-  background-color: #ff1a1a;
+  color: #fff;
 }
 
 .loading-container {
