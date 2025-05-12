@@ -108,6 +108,10 @@ const logout = () => {
   localStorage.removeItem("spotify_profile");
   router.push("/");
 };
+
+const goHome = () => {
+    router.push('/Home');
+};
 </script>
 
 <style scoped>
