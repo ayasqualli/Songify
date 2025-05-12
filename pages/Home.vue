@@ -4,12 +4,18 @@
       <div class="logo-container">
         <img src="../assets/small.png" alt="Logo" class="logo" />
       </div>
-      <h2>Library</h2>
+      <div class="library-header">
+        <h2>Library</h2>
+        <button class="create-button" @click="router.push('/create-playlist')">
+          <span style="font-size: 1.2em; font-weight: bold; margin-right: 4px"
+            >+</span
+          >
+          Create
+        </button>
+      </div>
       <ul>
         <li @click="router.push('/playlists')">Playlists</li>
-        <li @click="router.push('/artists')">Artists</li>
-        <li @click="router.push('/albums')">Albums</li>
-        <li @click="router.push('/tracks')">Tracks</li>
+        <li @click="router.push('/browse')">Browse</li>
       </ul>
     </aside>
 
@@ -30,13 +36,25 @@
           <li
             v-for="playlist in playlists.items.slice(0, 8)"
             :key="playlist.id"
+            @click="router.push(`/playlist/${playlist.id}`)"
           >
-            <img
-              :src="playlist.images?.[0]?.url"
-              alt="playlist cover"
-              width="50"
-            />
-            {{ playlist.name }}
+            <div v-if="playlist" class="playlist-container">
+              <div class="playlist-cover-container">
+                <img
+                  v-if="playlist.images && playlist.images.length > 0"
+                  :src="playlist.images[0]?.url"
+                  class="playlist-cover"
+                />
+                <div
+                  v-else
+                  class="default-cover-overlay"
+                  style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: transparent; border-radius: 4px;"
+                >
+                  <Icon name="ph:music-notes" size="64" class="default-cover-icon" style="color: #b3b3b3;" />
+                </div>
+              </div>
+              {{ playlist.name }}
+            </div>
           </li>
         </ul>
       </section>
@@ -48,6 +66,7 @@
             id: artist.id,
             images: artist.images,
             name: artist.name,
+            type: 'artist',
           }))
         "
       />
@@ -60,9 +79,10 @@
             images: track.album.images,
             name: track.name,
             artists: track.artists,
+            type: 'track',
           }))
         "
-        @click.prevent="navigateToTrack(track.id)"
+        @click="router.push(`/track/${track.id}`)"
       />
 
       <HorizontalSection
@@ -73,9 +93,10 @@
             images: track.track.album.images,
             name: track.track.name,
             artists: track.track.artists,
+            type: 'track',
           }))
         "
-        @item-click="playTrack"
+        @click="router.push(`/playlist/${playlist.id}`)"
       />
 
       <div v-if="loading" class="loading-state">
@@ -94,26 +115,12 @@ import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import HorizontalSection from "../components/HorizontalSection.vue";
 const router = useRouter();
-const route = useRoute();
 const profile = ref(null);
 const playlists = ref(null);
 const topArtists = ref([]);
 const topTracks = ref([]);
 const recentlyPlayed = ref([]);
-const trackId = route.params.id;
 const track = ref(null);
-
-const navigateToAlbum = (albumId) => {
-  router.push(`/album/${albumId}`);
-};
-
-const navigateToTrack = (trackId) => {
-  router.push(`/track/${trackId}`);
-};
-
-const navigateToArtist = (artistId) => {
-  router.push(`/artist/${artistId}`);
-};
 
 const uniqueRecentlyPlayed = computed(() => {
   const uniqueTracks = new Map();
@@ -124,38 +131,6 @@ const uniqueRecentlyPlayed = computed(() => {
   });
   return Array.from(uniqueTracks.values());
 });
-
-const getArtistImage = (artist) => {
-  return artist.images?.[0]?.url || "/default-artist.png";
-};
-
-const getTrackImage = (track) => {
-  return track.album?.images?.[2]?.url || "/default-track.png";
-};
-
-const getAlbumImage = (album) => {
-  return album.images?.[0]?.url || "/default-album.png";
-};
-
-const getPlaylistImage = (playlist) => {
-  return playlist.images?.[0]?.url || "../assets/default-playlist.png";
-};
-
-const getArtistNames = (artists) => {
-  if (!artists?.length) return "Unknown Artist";
-  return artists.map((artist) => artist.name).join(", ");
-};
-
-
-const getAlbumArtist = (album) => {
-  if (!album.artists?.length) return "Unknown Artist";
-  return album.artists[0].name;
-};
-
-const getPlaylistOwner = (playlist) => {
-  if (!playlist.owner?.display_name) return "Unknown Owner";
-  return playlist.owner.display_name;
-};
 
 onMounted(async () => {
   const token = localStorage.getItem("access_token");
@@ -238,21 +213,6 @@ onMounted(async () => {
 
     recentlyPlayed.value = (await resRecentlyPlayed.json()).items;
 
-    // Fetch track details
-    const trackResponse = await fetch(
-      `https://api.spotify.com/v1/tracks/${trackId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (!trackResponse.ok) {
-      throw new Error("Failed to fetch track");
-    }
-
-    track.value = await trackResponse.json();
   } catch (err) {
     console.error("Erreur Spotify:", err);
     playlists.value = [];
@@ -266,9 +226,6 @@ const logout = () => {
   router.push("/");
 };
 
-const handleSearch = () => {
-  triggerSearch();
-};
 </script>
 
 <style scoped>
@@ -292,6 +249,12 @@ const handleSearch = () => {
 .logo {
   width: 80px;
   height: auto;
+}
+
+.library-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .library h2 {
@@ -353,52 +316,6 @@ const handleSearch = () => {
   top: 50%;
   transform: translateY(-50%);
   color: #b3b3b3;
-}
-
-.search-input {
-  background-color: #393939;
-  border-radius: 24px;
-  border: none;
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 15px;
-  color: #b3b3b3;
-}
-
-.search-button {
-  background-color: #393939;
-  border: none;
-  border-radius: 50%;
-  padding: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-}
-
-.search-button:hover {
-  background-color: #3a3a3a;
-}
-
-.search-button svg {
-  width: 20px;
-  height: 20px;
-  stroke: #b3b3b3;
-  transition: stroke 0.2s ease;
-}
-
-.search-button:hover svg {
-  stroke: #fff;
-}
-
-.clear-button {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #b3b3b3;
-  cursor: pointer;
 }
 
 .profile-container {
@@ -555,18 +472,11 @@ const handleSearch = () => {
   font-style: italic;
 }
 
-button {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
+.playlist-cover {
+  width: 50px;
+  height: 50px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #ff1a1a;
 }
 
 .horizontal-section {
@@ -651,5 +561,21 @@ button:hover {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.create-button {
+  background-color: rgb(44, 45, 43, 0.7);
+  width: 80px;
+  border: none;
+  padding: 2px;
+  border-radius: 16px;
+  font-size: 12px;
+  margin: 0;
+}
+
+.create-button:hover {
+  background-color: rgb(44, 45, 43, 0.9);
+  transform: scale(1.05);
+  transition: all 0.2s ease;
 }
 </style>

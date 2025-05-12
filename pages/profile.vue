@@ -18,9 +18,34 @@
           <h1>{{ profile.display_name }}</h1>
           <p>{{ publicPlaylistsCount }} Public Playlists - {{ profile.followers?.total }} Followers</p>
         </div>
+        <button class="logout-button" @click="logout">Déconnexion</button>
       </div>
 
       <div class="profile-details">
+        <h2>Public Playlists</h2>
+        <div class="playlists-grid">
+          <div 
+            v-for="playlist in publicPlaylists" 
+            :key="playlist.id" 
+            class="playlist-card"
+            @click="router.push(`/playlist/${playlist.id}`)"
+          >
+            <div class="playlist-image">
+              <img 
+                v-if="playlist.images?.[0]?.url" 
+                :src="playlist.images[0].url" 
+                alt="Playlist Cover"
+              >
+              <div v-else class="default-image">
+                <Icon name="ph:music-notes" size="32" />
+              </div>
+            </div>
+            <div class="playlist-info">
+              <h3>{{ playlist.name }}</h3>
+              <p>{{ playlist.tracks.total }} tracks</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <button class="logout-button" @click="logout">Déconnexion</button>
@@ -37,6 +62,8 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const profile = ref(null);
+const publicPlaylists = ref([]);
+const publicPlaylistsCount = ref(0);
 
 onMounted(async () => {
   const token = localStorage.getItem("access_token");
@@ -48,15 +75,22 @@ onMounted(async () => {
   }
 
   try {
-    const resProfile = await fetch("https://api.spotify.com/v1/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const [resProfile, resPlaylists] = await Promise.all([
+      fetch("https://api.spotify.com/v1/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+      fetch("https://api.spotify.com/v1/me/playlists?", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    ]);
 
-    if (!resProfile.ok) {
-      throw new Error(`Failed to fetch profile: ${resProfile.statusText}`);
-    }
+    if (!resProfile.ok) throw new Error(`Failed to fetch profile: ${resProfile.statusText}`);
+    if (!resPlaylists.ok) throw new Error(`Failed to fetch playlists: ${resPlaylists.statusText}`);
 
     profile.value = await resProfile.json();
+    const playlistsData = await resPlaylists.json();
+    publicPlaylists.value = playlistsData.items.filter(playlist => playlist.public);
+    publicPlaylistsCount.value = publicPlaylists.value.length;
   } catch (err) {
     console.error("Erreur Spotify:", err);
   }
@@ -143,25 +177,63 @@ const logout = () => {
   margin-bottom: 2rem;
 }
 
-.detail-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem 0;
-  border-bottom: 1px solid #444;
-}
-
-.detail-item:last-child {
-  border-bottom: none;
-}
-
-.detail-label {
-  color: #b3b3b3;
-  font-weight: 500;
-}
-
-.detail-value {
+.profile-details h2 {
   color: #fff;
-  font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+
+.playlists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.playlist-card {
+  background: #383838;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.playlist-card:hover {
+  transform: translateY(-4px);
+}
+
+.playlist-image {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #282828;
+}
+
+.playlist-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.default-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b3b3b3;
+}
+
+.playlist-info {
+  padding: 1rem;
+}
+
+.playlist-info h3 {
+  color: #fff;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.playlist-info p {
+  color: #b3b3b3;
+  font-size: 0.875rem;
 }
 
 .logout-button {

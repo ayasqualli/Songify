@@ -3,7 +3,12 @@
       <h2 class="section-title">{{ title }}</h2>
   
       <ul v-if="items?.length" class="scroll-list">
-        <li v-for="item in items" :key="item.id" class="scroll-item">
+        <li 
+          v-for="item in items" 
+          :key="item.id" 
+          class="scroll-item"
+          @click="navigateToItem(item)"
+        >
           <div class="item-container">
             <img
               :src="item.images?.[0]?.url"
@@ -23,10 +28,24 @@
   </template>
   
   <script setup>
+  import { useRouter } from 'vue-router';
+  
+  const router = useRouter();
+  
   defineProps({
     title: String,
     items: Array,
-  })
+  });
+  
+  const navigateToItem = (item) => {
+    if (item.type === 'track') {
+      router.push(`/track/${item.id}`);
+    } else if (item.type === 'playlist') {
+      router.push(`/playlist/${item.id}`);
+    } else if (item.type === 'artist') {
+      router.push(`/artist/${item.id}`);
+    }
+  };
   </script>
   
   <style scoped>
@@ -60,6 +79,7 @@
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .scroll-item:hover {
@@ -106,5 +126,4 @@
 .loading {
   color: #888;
 }
-
   </style>

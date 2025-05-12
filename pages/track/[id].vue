@@ -1,4 +1,8 @@
 <template>
+    <div class="page-container">
+        <button class="home-button" @click="goHome">
+        <Icon name="ph:house" size="40" />
+      </button>
     <div v-if="track" class="track-container">
         <div class="track-header">
             <img :src="track.album.images[0]?.url" alt="Album Cover" class="track-image">
@@ -73,6 +77,7 @@
     <div v-else>
         <h2>Couldn't find track...</h2>
     </div>
+    </div>
 </template>
 
 <script setup>
@@ -111,6 +116,10 @@ const goToAlbum = (albumId) => {
 const goToArtist = (artistId) => {
     router.push(`/artist/${artistId}`)
 }
+const goHome = () => {
+  router.push("/Home");
+};
+
 
 onMounted(async () => {
     const token = localStorage.getItem('access_token')
@@ -141,6 +150,29 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.home-button {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 8px;
+  background: transparent;
+  color: white;
+  border: none;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  align-items:center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.home-button:hover {
+  transform: scale(1.05);
+  background-color: #3c3c3c;
+}
 .track-container {
     max-width: 1200px;
     margin: 0 auto;

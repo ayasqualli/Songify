@@ -95,6 +95,7 @@ onUnmounted(() => {
     width: 100%;
     max-width: 800px;
     height: 50px;
+    background: transparent;
     color: gray;
 }
   
@@ -108,6 +109,9 @@ onUnmounted(() => {
     margin: 0 15px;
     flex: 1;
     font-size: 16px;
+    border: 2px solid #292929;
+    padding: 16px;
+    border-radius: 32px;
 }
 
 .clear-search-btn {
